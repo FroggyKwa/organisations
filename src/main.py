@@ -9,10 +9,12 @@ from src.buildings import router as buildings_router
 from src.organizations import router as organizations_router
 
 
-app = FastAPI(title="Organizations API",
-              version="1.0",
-              docs_url="/docs",
-              redoc_url="/redoc",)
+app = FastAPI(
+    title="Organizations API",
+    version="1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,7 +24,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(organizations_router, prefix="/organizations", tags=["Organizations"])
+app.include_router(
+    organizations_router, prefix="/organizations", tags=["Organizations"]
+)
 app.include_router(buildings_router, prefix="/buildings", tags=["Buildings"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])

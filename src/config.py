@@ -2,9 +2,7 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=('.docker/.env', '.docker/.env.prod')
-    )
+    model_config = SettingsConfigDict(env_file=(".docker/.env", ".docker/.env.prod"))
 
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
@@ -20,5 +18,6 @@ class Settings(BaseSettings):
                 f"postgresql+psycopg2://{self.POSTGRES_USER}:"
                 f"{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}/{self.POSTGRES_DB}"
             )
+
 
 settings = Settings()

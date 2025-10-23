@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float
 from src.models import Base
 
+
 class Building(Base):
     __tablename__ = "buildings"
 
