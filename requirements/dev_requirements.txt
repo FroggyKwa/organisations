@@ -26,6 +26,7 @@ pathspec==0.12.1
 platformdirs==4.5.0
 psycopg2-binary==2.9.11
 pydantic==2.12.3
+pydantic-settings==2.11.0
 pydantic_core==2.41.4
 Pygments==2.19.2
 python-dotenv==1.1.1
