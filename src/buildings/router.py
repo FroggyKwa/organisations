@@ -19,11 +19,8 @@ def get_building(id: int, db: Session = Depends(get_db)) -> schemas.BuildingRead
 
 
 @router.put("/{id}", response_model=schemas.BuildingRead)
-def update_building(id: int, db: Session = Depends(get_db)) -> schemas.BuildingRead:
-    building = service.get_building(db, id)
-    if building is None:
-        raise exceptions.building_not_found()
-    return service.update_building(db, id, building)
+def update_building(id: int, new_data: schemas.BuildingUpdate, db: Session = Depends(get_db)) -> schemas.BuildingRead:
+    return service.update_building(db, id, new_data)
 
 
 @router.delete("/{id}", response_model=schemas.BuildingRead)
