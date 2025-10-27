@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 from src.activities import schemas as activities_schemas
@@ -43,5 +45,11 @@ class OrganizationRead(OrganizationBase):
         from_attributes = True
 
 
-class OrganizationUpdate(OrganizationRead):
-    pass
+class OrganizationUpdate(BaseModel):
+    name: Optional[str] = None
+    building_id: Optional[int] = None
+    phone_numbers: Optional[list[str]] = None
+    activity_ids: Optional[list[int]] = None
+
+    class Config:
+        from_attributes = True

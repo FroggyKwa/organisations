@@ -2,43 +2,50 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from . import schemas, models, exceptions
-from .. import Activity
+from src.organizations.models import Activity
 
 
-def get_organizations(db: Session):
+async def get_organizations(db: Session):
     return db.query(models.Organization).all()
 
-
-def get_organization(db: Session, id: int):
-    return db.query(models.Organization).get(id)
-
-
-def update_organization(
-    db: Session, id: int, new_data: schemas.OrganizationUpdate
+async def update_organization(
+    db: Session, organization: models.Organization, new_data: schemas.OrganizationUpdate
 ) -> models.Organization:
-    organization = get_organization(db, id)
     if organization is None:
         raise exceptions.organization_not_found()
-    for field, value in new_data.model_dump(exclude_unset=True).items():
-        setattr(organization, field, value)
+
+    update_data = new_data.model_dump(exclude_unset=True).items()
+    if "name" in update_data:
+        organization.name = update_data["name"]
+    if "building_id" in update_data:
+        organization.building_id = update_data["building_id"]
+
+    if "phone_numbers" in update_data:
+        organization.phones = [
+            models.Phone(number=num) for num in update_data["phone_numbers"]
+        ]
+
+    if "activity_ids" in update_data:
+        activities = (
+            db.query(Activity)
+            .filter(Activity.id.in_(update_data["activity_ids"]))
+            .all()
+        )
+        organization.activities = activities
 
     db.commit()
     db.refresh(organization)
     return organization
 
 
-def delete_organization(
-    db: Session, organization: models.Organization
-) -> models.Organization:
+async def delete_organization(db: Session, organization: models.Organization) -> None:
     db.delete(organization)
     db.commit()
-    return organization
 
 
-def create_organization(
+async def create_organization(
     db: Session, organization: schemas.OrganizationCreate
 ) -> models.Organization:
-    print(organization)
     db_organization = models.Organization(
         **organization.model_dump(exclude={"activity_ids", "phones"})
     )
