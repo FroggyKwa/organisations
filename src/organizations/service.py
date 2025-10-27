@@ -90,3 +90,13 @@ async def get_organizations_by_activity(
         .filter(models.Organization.activities.any(id=activity.id))
         .all()
     )
+
+
+async def get_organizations_by_name(
+    name: str, db: Session
+) -> list[type[models.Organization]]:
+    return (
+        db.query(models.Organization)
+        .filter(models.Organization.name.ilike(f"%{name}%"))
+        .all()
+    )

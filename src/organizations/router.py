@@ -54,15 +54,23 @@ async def delete_organization(
 
 @router.get("/by_building/{building_id}", response_model=list[schemas.OrganizationRead])
 async def get_organizations_by_building(
-        building: buildings_models.Building = Depends(get_building_by_id),
-        db: Session = Depends(get_db),
+    building: buildings_models.Building = Depends(get_building_by_id),
+    db: Session = Depends(get_db),
 ):
     return await service.get_organizations_by_building(building, db)
 
 
 @router.get("/by_activity/{activity_id}", response_model=list[schemas.OrganizationRead])
 async def get_organizations_by_activity(
-        activity: activities_models.Activity = Depends(get_activity_by_id),
-        db: Session = Depends(get_db),
+    activity: activities_models.Activity = Depends(get_activity_by_id),
+    db: Session = Depends(get_db),
 ):
     return await service.get_organizations_by_activity(activity, db)
+
+
+@router.get("/by_name/{name}", response_model=list[schemas.OrganizationRead])
+async def get_organizations_by_activity(
+    name: str,
+    db: Session = Depends(get_db),
+):
+    return await service.get_organizations_by_name(name, db)
