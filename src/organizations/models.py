@@ -10,7 +10,7 @@ class Organization(Base):
     __tablename__ = "organizations"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, index=True)
     building_id = Column(
         Integer,
         ForeignKey("buildings.id", ondelete="CASCADE"),
