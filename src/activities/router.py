@@ -21,14 +21,14 @@ async def create_activity(
     return service.create_activity(db, activity_data)
 
 
-@router.get("/{id}", response_model=schemas.ActivityRead)
+@router.get("/{activity_id}", response_model=schemas.ActivityRead)
 async def get_activity(
     activity: models.Activity = Depends(get_activity_by_id),
 ) -> schemas.ActivityRead:
     return activity
 
 
-@router.put("/{id}", response_model=schemas.ActivityRead)
+@router.put("/{activity_id}", response_model=schemas.ActivityRead)
 async def update_activity(
     new_data: schemas.ActivityUpdate,
     activity: models.Activity = Depends(get_activity_by_id),
@@ -37,7 +37,7 @@ async def update_activity(
     return await service.update_activity(db, id, new_data)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{activity_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_activity(
     activity: models.Activity = Depends(get_activity_by_id),
     db: Session = Depends(get_db),

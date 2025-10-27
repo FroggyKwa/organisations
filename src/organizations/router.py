@@ -3,10 +3,14 @@ from starlette import status
 from sqlalchemy.orm import Session
 
 from . import schemas, service, exceptions
+
 from src.database import get_db
 from .dependencies import get_organization_by_id
+
 from src.buildings.dependencies import get_building_by_id
 from src.buildings import models as buildings_models
+from src.activities import models as activities_models
+from src.activities.dependencies import get_activity_by_id
 
 router = APIRouter()
 
@@ -54,3 +58,11 @@ async def get_organizations_by_building(
         db: Session = Depends(get_db),
 ):
     return await service.get_organizations_by_building(building, db)
+
+
+@router.get("/by_activity/{activity_id}", response_model=list[schemas.OrganizationRead])
+async def get_organizations_by_activity(
+        activity: activities_models.Activity = Depends(get_activity_by_id),
+        db: Session = Depends(get_db),
+):
+    return await service.get_organizations_by_activity(activity, db)

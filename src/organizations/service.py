@@ -3,12 +3,13 @@ from typing import Any, Coroutine
 from sqlalchemy.orm import Session
 
 from . import schemas, models, exceptions
-from src.organizations.models import Activity
+from src.activities import models as activities_models
 import src.activities.exceptions as activities_exceptions
 
 
 async def get_organizations(db: Session):
     return db.query(models.Organization).all()
+
 
 async def update_organization(
     db: Session, organization: models.Organization, new_data: schemas.OrganizationUpdate
@@ -30,8 +31,8 @@ async def update_organization(
     if "activity_ids" in update_data:
         print(update_data["activity_ids"])
         activities = (
-            db.query(Activity)
-            .filter(Activity.id.in_(update_data["activity_ids"]))
+            db.query(activities_models.Activity)
+            .filter(activities_models.Activity.id.in_(update_data["activity_ids"]))
             .all()
         )
         organization.activities = activities
@@ -55,7 +56,9 @@ async def create_organization(
 
     if organization.activity_ids:
         activities = (
-            db.query(Activity).filter(Activity.id.in_(organization.activity_ids)).all()
+            db.query(activities_models.Activity)
+            .filter(activities_models.Activity.id.in_(organization.activity_ids))
+            .all()
         )
         if not activities:
             raise activities_exceptions.activity_not_found()
@@ -72,9 +75,18 @@ async def create_organization(
     return db_organization
 
 
-async def get_organizations_by_building(building: models.Building, db: Session) -> list[type[models.Organization]]:
+async def get_organizations_by_building(
+    building: models.Building, db: Session
+) -> list[type[models.Organization]]:
+    return db.query(models.Organization).filter_by(building_id=building.id).all()
+
+
+async def get_organizations_by_activity(
+    activity: activities_models.Activity, db: Session
+) -> list[type[models.Organization]]:
     return (
         db.query(models.Organization)
-        .filter_by(building_id=building.id)
+        .join(models.Organization.activities)
+        .filter(models.Organization.activities.any(id=activity.id))
         .all()
     )
