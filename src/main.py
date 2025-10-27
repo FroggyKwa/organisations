@@ -1,11 +1,8 @@
-from typing import Union
-
 from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
 
-from dependencies import get_api_key
+from src.dependencies import get_api_key
 from src.activities import router as activities_router
-from src.auth import router as auth_router
 from src.buildings import router as buildings_router
 from src.organizations import router as organizations_router
 
@@ -31,7 +28,6 @@ app.include_router(
 )
 app.include_router(buildings_router, prefix="/buildings", tags=["Buildings"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
 
 @app.get("/", tags=["Root"])
