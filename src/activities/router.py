@@ -14,7 +14,7 @@ async def get_activities(db: Session = Depends(get_db)) -> schemas.ActivityRead:
     """
     Get all activities
     """
-    return service.get_activities(db)
+    return await service.get_activities(db)
 
 
 @router.post("/", response_model=schemas.ActivityRead)
@@ -24,7 +24,7 @@ async def create_activity(
     """
     Create a new activity
     """
-    return service.create_activity(db, activity_data)
+    return await service.create_activity(db, activity_data)
 
 
 @router.get("/{activity_id}", response_model=schemas.ActivityRead)
@@ -59,4 +59,4 @@ async def delete_activity(
     """
     if activity is None:
         raise exceptions.activity_not_found()
-    return service.delete_activity(db, activity)
+    return await service.delete_activity(db, activity)

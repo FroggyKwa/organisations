@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, field_validator, ValidationError
+from pydantic import BaseModel, field_validator, ValidationError, ConfigDict
 
 
 class ActivityBase(BaseModel):
@@ -16,13 +16,11 @@ class ActivityRead(ActivityBase):
     id: int
     children: list["ActivityRead"] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ActivityUpdate(BaseModel):
     name: Optional[str]
     parent_id: Optional[int] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

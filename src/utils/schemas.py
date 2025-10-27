@@ -10,4 +10,4 @@ class BBoxQuery(BaseModel):
 class CircleQuery(BaseModel):
     center_lat: float
     center_lon: float
-    radius_km: float
+    radius: float

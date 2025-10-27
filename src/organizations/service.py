@@ -117,7 +117,6 @@ async def get_organizations_in_bbox(
             models.Building.latitude.between(bbox.min_latitude, bbox.max_latitude),
             models.Building.longitude.between(bbox.min_longitude, bbox.max_longitude),
         )
-        .subquery()
     )
     return (
         db.query(models.Organization)
@@ -135,7 +134,7 @@ def get_organizations_in_radius(
         raise exceptions.latitude_incorrect()
     if not (-180 <= circle.center_lon <= 180):
         raise exceptions.longitude_incorrect()
-    if circle.radius_km <= 0:
+    if circle.radius <= 0:
         raise exceptions.radius_incorrect()
 
     R = 6371.0
@@ -151,13 +150,11 @@ def get_organizations_in_radius(
         func.radians(buildings_models.Building.latitude)
     )
 
-    safe_arg = func.greatest(-1.0, func.least(1.0, cos_product))  # nan protection
-    distance = R * func.acos(safe_arg)
+    distance = R * func.acos(cos_product)
 
     buildings_subq = (
         db.query(buildings_models.Building.id)
-        .filter(distance <= float(circle.radius_km))
-        .subquery()
+        .filter(distance <= float(circle.radius))
     )
 
     return (

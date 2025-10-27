@@ -4,11 +4,11 @@ from sqlalchemy.orm import Session
 from . import schemas, models, exceptions
 
 
-def get_activities(db: Session):
+async def get_activities(db: Session):
     return db.query(models.Activity).filter(models.Activity.parent_id.is_(None)).all()
 
 
-def create_activity(db: Session, activity: schemas.ActivityCreate) -> models.Activity:
+async def create_activity(db: Session, activity: schemas.ActivityCreate) -> models.Activity:
     db_activity = models.Activity(**activity.model_dump())
     db.add(db_activity)
     try:
@@ -20,12 +20,12 @@ def create_activity(db: Session, activity: schemas.ActivityCreate) -> models.Act
     return db_activity
 
 
-def update_activity(
+async def update_activity(
     db: Session, activity: models.Activity, new_data: schemas.ActivityUpdate
 ) -> models.Activity:
     if activity is None:
         raise exceptions.activity_not_found()
-    for field, value in new_data.model_dump(exclude_unset=True):
+    for field, value in new_data.model_dump(exclude_unset=True).items():
         setattr(activity, field, value)
 
     db.commit()
@@ -33,7 +33,7 @@ def update_activity(
     return activity
 
 
-def delete_activity(db: Session, activity: models.Activity) -> models.Activity:
+async def delete_activity(db: Session, activity: models.Activity) -> models.Activity:
     db.delete(activity)
     db.commit()
     return activity

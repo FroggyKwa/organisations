@@ -13,7 +13,7 @@ async def update_building(
 
     if building is None:
         raise exceptions.building_not_found()
-    for field, value in new_data.model_dump(exclude_unset=True):
+    for field, value in new_data.model_dump(exclude_unset=True).items():
         setattr(building, field, value)
 
     db.commit()

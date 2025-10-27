@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from src.activities import schemas as activities_schemas
 from src.buildings import schemas as buildings_schemas
@@ -17,8 +17,7 @@ class PhoneCreate(PhoneBase):
 class PhoneRead(PhoneBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PhoneUpdate(PhoneRead):
@@ -41,8 +40,7 @@ class OrganizationRead(OrganizationBase):
     activities: list[activities_schemas.ActivityRead]
     building: buildings_schemas.BuildingRead
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrganizationUpdate(BaseModel):
@@ -51,5 +49,4 @@ class OrganizationUpdate(BaseModel):
     phone_numbers: Optional[list[str]] = None
     activity_ids: Optional[list[int]] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
