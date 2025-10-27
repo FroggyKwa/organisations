@@ -19,6 +19,3 @@ async def get_phone_by_id(phone_id: int, db: Session = Depends(get_db)):
     if not phone:
         raise exceptions.phone_not_found()
     return phone
-
-OrganizationById = Annotated[models.Organization, Depends(get_organization_by_id)]
-PhoneById = Annotated[models.Phone, Depends(get_phone_by_id)]
