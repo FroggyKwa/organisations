@@ -21,14 +21,14 @@ async def create_building(
     return await service.create_building(db, building_data)
 
 
-@router.get("/{id}", response_model=schemas.BuildingRead)
+@router.get("/{building_id}", response_model=schemas.BuildingRead)
 async def get_building(
     building: models.Building = Depends(get_building_by_id), db: Session = Depends(get_db)
 ) -> schemas.BuildingRead:
     return building
 
 
-@router.put("/{id}", response_model=schemas.BuildingRead)
+@router.put("/{building_id}", response_model=schemas.BuildingRead)
 async def update_building(
     new_data: schemas.BuildingUpdate,
     building: models.Building = Depends(get_building_by_id),
@@ -37,7 +37,7 @@ async def update_building(
     return await service.update_building(db, building, new_data)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{building_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_building(
     building: models.Building = Depends(get_building_by_id), db: Session = Depends(get_db)
 ) -> None:

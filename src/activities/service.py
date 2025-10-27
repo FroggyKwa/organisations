@@ -25,7 +25,7 @@ def update_activity(
 ) -> models.Activity:
     if activity is None:
         raise exceptions.activity_not_found()
-    for field, value in new_data.model_dump(exclude_unset=True).items():
+    for field, value in new_data.model_dump(exclude_unset=True):
         setattr(activity, field, value)
 
     db.commit()

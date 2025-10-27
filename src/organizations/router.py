@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from . import schemas, service, exceptions
 from src.database import get_db
 from .dependencies import get_organization_by_id
+from src.buildings.dependencies import get_building_by_id
+from src.buildings import models as buildings_models
 
 router = APIRouter()
 
@@ -44,3 +46,11 @@ async def delete_organization(
     if organization is None:
         raise exceptions.organization_not_found()
     await service.delete_organization(db, organization)
+
+
+@router.get("/by_building/{building_id}", response_model=list[schemas.OrganizationRead])
+async def get_organizations_by_building(
+        building: buildings_models.Building = Depends(get_building_by_id),
+        db: Session = Depends(get_db),
+):
+    return await service.get_organizations_by_building(building, db)
