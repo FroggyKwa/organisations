@@ -1,10 +1,15 @@
 from typing import Any, Coroutine
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from . import schemas, models, exceptions
+
+from src.buildings import models as buildings_models
+
 from src.activities import models as activities_models
 import src.activities.exceptions as activities_exceptions
+
 from src.utils import schemas as utils_schemas
 
 
@@ -104,7 +109,7 @@ async def get_organizations_by_name(
 
 
 async def get_organizations_in_bbox(
-    db: Session, bbox: utils_schemas.BBox
+    db: Session, bbox: utils_schemas.BBoxQuery
 ) -> list[type[models.Organization]]:
     buildings = (
         db.query(models.Building.id)
@@ -117,5 +122,46 @@ async def get_organizations_in_bbox(
     return (
         db.query(models.Organization)
         .filter(models.Organization.building_id.in_(buildings))
+        .all()
+    )
+
+
+def get_organizations_in_radius(
+    db: Session,
+    circle: utils_schemas.CircleQuery,
+) -> list[type[models.Organization]]:
+    R = 6371
+    if not (-90 <= circle.center_lat <= 90):
+        raise exceptions.latitude_incorrect()
+    if not (-180 <= circle.center_lon <= 180):
+        raise exceptions.longitude_incorrect()
+    if circle.radius_km <= 0:
+        raise exceptions.radius_incorrect()
+
+    R = 6371.0
+
+    cos_product = func.cos(func.radians(circle.center_lat)) * func.cos(
+        func.radians(buildings_models.Building.latitude)
+    ) * func.cos(
+        func.radians(buildings_models.Building.longitude)
+        - func.radians(circle.center_lon)
+    ) + func.sin(
+        func.radians(circle.center_lat)
+    ) * func.sin(
+        func.radians(buildings_models.Building.latitude)
+    )
+
+    safe_arg = func.greatest(-1.0, func.least(1.0, cos_product))  # nan protection
+    distance = R * func.acos(safe_arg)
+
+    buildings_subq = (
+        db.query(buildings_models.Building.id)
+        .filter(distance <= float(circle.radius_km))
+        .subquery()
+    )
+
+    return (
+        db.query(models.Organization)
+        .filter(models.Organization.building_id.in_(buildings_subq))
         .all()
     )

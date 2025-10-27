@@ -81,7 +81,15 @@ async def get_organizations_by_activity(
 
 @router.get("/in_bbox/", response_model=list[schemas.OrganizationRead])
 async def get_organizations_by_activity(
-    bbox: utils_schemas.BBox = Depends(),
+    bbox: utils_schemas.BBoxQuery = Depends(),
     db: Session = Depends(get_db),
 ):
     return await service.get_organizations_in_bbox(db, bbox)
+
+
+@router.get("/in_radius/", response_model=list[schemas.OrganizationRead])
+def organizations_in_radius(
+    circle: utils_schemas.CircleQuery = Depends(),
+    db: Session = Depends(get_db),
+):
+    return service.get_organizations_in_radius(db, circle)
