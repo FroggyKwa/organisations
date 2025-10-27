@@ -20,6 +20,9 @@ router = APIRouter()
 
 @router.get("/", response_model=list[schemas.OrganizationRead])
 async def get_organizations(db: Session = Depends(get_db)) -> schemas.OrganizationRead:
+    """
+    Get all organizations
+    """
     return await service.get_organizations(db)
 
 
@@ -27,6 +30,9 @@ async def get_organizations(db: Session = Depends(get_db)) -> schemas.Organizati
 async def create_organization(
     organization_data: schemas.OrganizationCreate, db: Session = Depends(get_db)
 ) -> schemas.OrganizationRead:
+    """
+    Create a new organization
+    """
     return await service.create_organization(db, organization_data)
 
 
@@ -34,6 +40,9 @@ async def create_organization(
 async def get_organization(
     organization=Depends(get_organization_by_id),
 ) -> schemas.OrganizationRead:
+    """
+    Get an organization by id
+    """
     return organization
 
 
@@ -43,6 +52,9 @@ async def update_organization(
     organization=Depends(get_organization_by_id),
     db: Session = Depends(get_db),
 ) -> schemas.OrganizationRead:
+    """
+    Update an organization by id
+    """
     return await service.update_organization(db, organization, new_data)
 
 
@@ -50,6 +62,9 @@ async def update_organization(
 async def delete_organization(
     organization=Depends(get_organization_by_id), db: Session = Depends(get_db)
 ) -> None:
+    """
+    Delete an organization by id
+    """
     if organization is None:
         raise exceptions.organization_not_found()
     await service.delete_organization(db, organization)
@@ -60,6 +75,9 @@ async def get_organizations_by_building(
     building: buildings_models.Building = Depends(get_building_by_id),
     db: Session = Depends(get_db),
 ):
+    """
+    Get all organizations by building
+    """
     return await service.get_organizations_by_building(building, db)
 
 
@@ -68,6 +86,9 @@ async def get_organizations_by_activity(
     activity: activities_models.Activity = Depends(get_activity_by_id),
     db: Session = Depends(get_db),
 ):
+    """
+    Get all organizations by activity_id
+    """
     return await service.get_organizations_by_activity(activity, db)
 
 
@@ -76,6 +97,9 @@ async def get_organizations_by_activity(
     name: str,
     db: Session = Depends(get_db),
 ):
+    """
+    Get all organizations by name
+    """
     return await service.get_organizations_by_name(name, db)
 
 
@@ -84,6 +108,9 @@ async def get_organizations_by_activity(
     bbox: utils_schemas.BBoxQuery = Depends(),
     db: Session = Depends(get_db),
 ):
+    """
+    Get all organizations by bbox
+    """
     return await service.get_organizations_in_bbox(db, bbox)
 
 
@@ -92,4 +119,8 @@ def organizations_in_radius(
     circle: utils_schemas.CircleQuery = Depends(),
     db: Session = Depends(get_db),
 ):
+    """
+    Get all organizations in followed radius using Haversine formula
+    (great-circle distance between two points on a sphere)
+    """
     return service.get_organizations_in_radius(db, circle)
