@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from . import schemas, models, exceptions
 from src.activities import models as activities_models
 import src.activities.exceptions as activities_exceptions
+from src.utils import schemas as utils_schemas
 
 
 async def get_organizations(db: Session):
@@ -98,5 +99,23 @@ async def get_organizations_by_name(
     return (
         db.query(models.Organization)
         .filter(models.Organization.name.ilike(f"%{name}%"))
+        .all()
+    )
+
+
+async def get_organizations_in_bbox(
+    db: Session, bbox: utils_schemas.BBox
+) -> list[type[models.Organization]]:
+    buildings = (
+        db.query(models.Building.id)
+        .filter(
+            models.Building.latitude.between(bbox.min_latitude, bbox.max_latitude),
+            models.Building.longitude.between(bbox.min_longitude, bbox.max_longitude),
+        )
+        .subquery()
+    )
+    return (
+        db.query(models.Organization)
+        .filter(models.Organization.building_id.in_(buildings))
         .all()
     )

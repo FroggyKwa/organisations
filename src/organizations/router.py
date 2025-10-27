@@ -12,6 +12,9 @@ from src.buildings import models as buildings_models
 from src.activities import models as activities_models
 from src.activities.dependencies import get_activity_by_id
 
+from src.utils import schemas as utils_schemas
+
+
 router = APIRouter()
 
 
@@ -74,3 +77,11 @@ async def get_organizations_by_activity(
     db: Session = Depends(get_db),
 ):
     return await service.get_organizations_by_name(name, db)
+
+
+@router.get("/in_bbox/", response_model=list[schemas.OrganizationRead])
+async def get_organizations_by_activity(
+    bbox: utils_schemas.BBox = Depends(),
+    db: Session = Depends(get_db),
+):
+    return await service.get_organizations_in_bbox(db, bbox)
