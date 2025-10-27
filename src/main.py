@@ -1,8 +1,9 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
 
+from dependencies import get_api_key
 from src.activities import router as activities_router
 from src.auth import router as auth_router
 from src.buildings import router as buildings_router
@@ -14,6 +15,7 @@ app = FastAPI(
     version="1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    dependencies=[Depends(get_api_key)]
 )
 
 app.add_middleware(

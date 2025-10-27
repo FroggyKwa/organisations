@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     DATABASE_URL: str | None = None
     DEBUG: bool = False
+    API_KEY: str | None = None
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
