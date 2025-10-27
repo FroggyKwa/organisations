@@ -1,38 +1,47 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from starlette import status
 
-from . import schemas, service, exceptions
+from . import schemas, service, exceptions, models
 from src.database import get_db
+from .dependencies import get_activity_by_id
 
 router = APIRouter()
 
 
 @router.get("/", response_model=list[schemas.ActivityRead])
-def get_activities(db: Session = Depends(get_db)
-) -> schemas.ActivityRead:
+async def get_activities(db: Session = Depends(get_db)) -> schemas.ActivityRead:
     return service.get_activities(db)
 
 
-@router.get("/{id}", response_model=schemas.ActivityRead)
-def get_activity(id: int, db: Session = Depends(get_db)) -> schemas.ActivityRead:
-    return service.get_activity(db, id)
-
-
-@router.put("/{id}", response_model=schemas.ActivityRead)
-def update_activity(id: int, new_data: schemas.ActivityUpdate, db: Session = Depends(get_db)) -> schemas.ActivityRead:
-    return service.update_activity(db, id, new_data)
-
-
-@router.delete("/{id}", response_model=schemas.ActivityRead)
-def delete_activity(id: int, db: Session = Depends(get_db)) -> None:
-    activity = service.get_activity(db, id)
-    if activity is None:
-        raise exceptions.activity_not_found()
-    return service.delete_activity(db, activity)
-
-
 @router.post("/", response_model=schemas.ActivityRead)
-def create_activity(
+async def create_activity(
     activity_data: schemas.ActivityCreate, db: Session = Depends(get_db)
 ) -> schemas.ActivityRead:
     return service.create_activity(db, activity_data)
+
+
+@router.get("/{id}", response_model=schemas.ActivityRead)
+async def get_activity(
+    activity: models.Activity = Depends(get_activity_by_id),
+) -> schemas.ActivityRead:
+    return activity
+
+
+@router.put("/{id}", response_model=schemas.ActivityRead)
+async def update_activity(
+    new_data: schemas.ActivityUpdate,
+    activity: models.Activity = Depends(get_activity_by_id),
+    db: Session = Depends(get_db),
+) -> schemas.ActivityRead:
+    return await service.update_activity(db, id, new_data)
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_activity(
+    activity: models.Activity = Depends(get_activity_by_id),
+    db: Session = Depends(get_db),
+) -> None:
+    if activity is None:
+        raise exceptions.activity_not_found()
+    return service.delete_activity(db, activity)

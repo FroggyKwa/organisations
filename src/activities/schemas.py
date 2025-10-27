@@ -20,5 +20,9 @@ class ActivityRead(ActivityBase):
         from_attributes = True
 
 
-class ActivityUpdate(ActivityRead):
-    pass
+class ActivityUpdate(BaseModel):
+    name: Optional[str]
+    parent_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
