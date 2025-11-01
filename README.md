@@ -31,4 +31,4 @@ Swagger доступен по `http://host:8000/docs`, Redoc по `http://host:8
 - Тесты автоматически запускаются при старте контейнера.
 - Для запуска извне:
 
-docker-compose -f `.docker/docker-compose.yml run api pytest`
+`docker-compose -f .docker/docker-compose.yml run api pytest`
